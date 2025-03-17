@@ -1,0 +1,19 @@
+[Unit]
+Description=GraphQnA API Server
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=graphqna
+WorkingDirectory=/opt/graphqna
+EnvironmentFile=/opt/graphqna/.env
+ExecStart=/opt/graphqna/venv/bin/python /opt/graphqna/scripts/run_api.py
+Restart=on-failure
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=graphqna-api
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,90 @@
+# Python virtual environments
+venv/
+env/
+ENV/
+.env
+
+# Python bytecode and cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Log files
+logs/*
+!logs/.gitkeep
+*.log
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Sensitive information (but keep example)
+.env
+!.env.example
+secrets/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Temporary and output files
+temp/
+output/
+data/processed/*
+!data/processed/.gitkeep
+data/raw/*
+!data/raw/.gitkeep
+
+# Documentation build
+docs/_build/
+docs/api/_build/
+
+# Neo4j specific
+neo4j/data/
+neo4j/logs/
+neo4j/import/
+neo4j/plugins/
+
+# Test reports
+.coverage
+coverage.xml
+.pytest_cache/
+reports/
+
+# Miscellaneous
+.metals/
+.bloop/
+.history/
+node_modules/
+*.bak
+.cursor/
+CLAUDE.md
+
+# Domain configuration (only keep the example)
+graphqna/config/domain_config.py
+tests/resources/test_questions_domain.md
+
+# Domain-specific tests
+tests/resources/test_questions.md
+
+# Keep these empty dirs with .gitkeep
+!*/.gitkeep
