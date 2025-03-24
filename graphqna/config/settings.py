@@ -1,12 +1,12 @@
 """Settings management for GraphQnA using dependency injection pattern."""
 
-import os
 import importlib.util
+import os
 import sys
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, validator
@@ -28,20 +28,28 @@ domain_config_example_path = Path(__file__).parent / "domain_config_example.py"
 # Import the appropriate configuration module
 if domain_config_path.exists():
     try:
-        spec = importlib.util.spec_from_file_location("domain_config", domain_config_path)
+        spec = importlib.util.spec_from_file_location(
+            "domain_config", domain_config_path
+        )
         domain_config = importlib.util.module_from_spec(spec)
         sys.modules["domain_config"] = domain_config
         spec.loader.exec_module(domain_config)
     except Exception as e:
         # Fallback to the example config if there's an error
-        print(f"Error loading domain_config.py: {str(e)}. Falling back to example config.")
-        spec = importlib.util.spec_from_file_location("domain_config_example", domain_config_example_path)
+        print(
+            f"Error loading domain_config.py: {str(e)}. Falling back to example config."
+        )
+        spec = importlib.util.spec_from_file_location(
+            "domain_config_example", domain_config_example_path
+        )
         domain_config = importlib.util.module_from_spec(spec)
         sys.modules["domain_config_example"] = domain_config
         spec.loader.exec_module(domain_config)
 else:
     # Use the example config if the domain_config.py doesn't exist
-    spec = importlib.util.spec_from_file_location("domain_config_example", domain_config_example_path)
+    spec = importlib.util.spec_from_file_location(
+        "domain_config_example", domain_config_example_path
+    )
     domain_config = importlib.util.module_from_spec(spec)
     sys.modules["domain_config_example"] = domain_config
     spec.loader.exec_module(domain_config)
@@ -117,6 +125,12 @@ class Settings(BaseModel):
     output_dir: Path = Field(default=OUTPUT_DIR)
     logs_dir: Path = Field(default=LOGS_DIR)
 
+    # API Security
+    api_key: Optional[str] = Field(
+        default=os.getenv("GRAPHQNA_API_KEY", None),
+        description="API key for authentication",
+    )
+
     # Neo4j
     neo4j: Neo4jSettings = Field(
         default_factory=lambda: Neo4jSettings(
@@ -170,103 +184,127 @@ class Settings(BaseModel):
         default=getattr(domain_config, "DOMAIN_NAME", "Knowledge Domain")
     )
     domain_description: str = Field(
-        default=getattr(domain_config, "DOMAIN_DESCRIPTION", "A knowledge graph for documentation")
+        default=getattr(
+            domain_config, "DOMAIN_DESCRIPTION", "A knowledge graph for documentation"
+        )
     )
-    
+
     # Entity definitions from domain config
     entity_definitions: List[Dict] = Field(
-        default=getattr(domain_config, "ENTITY_DEFINITIONS", [
-            {
-                "label": "Entity",
-                "description": "A generic entity",
-                "properties": [
-                    {"name": "name", "type": "STRING"},
-                    {"name": "description", "type": "STRING"},
-                ],
-            }
-        ])
+        default=getattr(
+            domain_config,
+            "ENTITY_DEFINITIONS",
+            [
+                {
+                    "label": "Entity",
+                    "description": "A generic entity",
+                    "properties": [
+                        {"name": "name", "type": "STRING"},
+                        {"name": "description", "type": "STRING"},
+                    ],
+                }
+            ],
+        )
     )
 
     # Relation definitions from domain config
     relation_definitions: List[Dict] = Field(
-        default=getattr(domain_config, "RELATION_DEFINITIONS", [
-            {
-                "label": "RELATES_TO",
-                "description": "A generic relationship between entities",
-                "properties": [],
-            }
-        ])
+        default=getattr(
+            domain_config,
+            "RELATION_DEFINITIONS",
+            [
+                {
+                    "label": "RELATES_TO",
+                    "description": "A generic relationship between entities",
+                    "properties": [],
+                }
+            ],
+        )
     )
 
     # Schema triplets from domain config
     schema_triplets: List[List[str]] = Field(
-        default=getattr(domain_config, "SCHEMA_TRIPLETS", [
-            ["Entity", "RELATES_TO", "Entity"]
-        ])
+        default=getattr(
+            domain_config, "SCHEMA_TRIPLETS", [["Entity", "RELATES_TO", "Entity"]]
+        )
     )
-    
+
     # Domain-specific prompts
-    domain_prompts: Dict = Field(
-        default=getattr(domain_config, "PROMPTS", {})
-    )
-    
+    domain_prompts: Dict = Field(default=getattr(domain_config, "PROMPTS", {}))
+
     # Example queries for documentation and testing
-    example_queries: Dict = Field(
-        default=getattr(domain_config, "EXAMPLE_QUERIES", {})
-    )
-    
+    example_queries: Dict = Field(default=getattr(domain_config, "EXAMPLE_QUERIES", {}))
+
     # Example Cypher queries
     example_cypher_queries: Dict = Field(
         default=getattr(domain_config, "EXAMPLE_CYPHER_QUERIES", {})
     )
-    
+
     # Default node labels
     default_node_labels: List[str] = Field(
-        default=getattr(domain_config, "DEFAULT_NODE_LABELS", ["Document", "Chunk", "Entity"])
+        default=getattr(
+            domain_config, "DEFAULT_NODE_LABELS", ["Document", "Chunk", "Entity"]
+        )
     )
-    
+
     # Default relationship types
     default_relationship_types: List[str] = Field(
-        default=getattr(domain_config, "DEFAULT_RELATIONSHIP_TYPES", ["PART_OF_DOCUMENT", "NEXT_CHUNK", "RELATES_TO"])
+        default=getattr(
+            domain_config,
+            "DEFAULT_RELATIONSHIP_TYPES",
+            ["PART_OF_DOCUMENT", "NEXT_CHUNK", "RELATES_TO"],
+        )
     )
-    
+
     # Response templates for consistent messaging
     response_templates: Dict[str, str] = Field(
-        default=getattr(domain_config, "RESPONSE_TEMPLATES", {
-            "not_applicable": "Not applicable: This information is not available in the {domain_name} knowledge base.",
-            "verify_info": "Please verify this information in the {domain_name} documentation for the most up-to-date details.",
-            "insufficient_info": "I don't have enough information about this in the {domain_name} knowledge base."
-        })
+        default=getattr(
+            domain_config,
+            "RESPONSE_TEMPLATES",
+            {
+                "not_applicable": "Not applicable: This information is not available in the {domain_name} knowledge base.",
+                "verify_info": "Please verify this information in the {domain_name} documentation for the most up-to-date details.",
+                "insufficient_info": "I don't have enough information about this in the {domain_name} knowledge base.",
+            },
+        )
     )
-    
+
     # Fallback queries for when LLM-generated queries fail
     fallback_queries: Dict[str, str] = Field(
-        default=getattr(domain_config, "FALLBACK_QUERIES", {
-            "default": "MATCH (n) RETURN n.name, n.description LIMIT 10",
-            "activity_types": "MATCH (a:ActivityType) RETURN a.name, a.description, a.category",
-            "roles": "MATCH (r:Role) RETURN r.name, r.description",
-            "processes": "MATCH (p:Process) RETURN p.name, p.description",
-            "features": "MATCH (f:Feature) RETURN f.name, f.description, f.category"
-        })
+        default=getattr(
+            domain_config,
+            "FALLBACK_QUERIES",
+            {
+                "default": "MATCH (n) RETURN n.name, n.description LIMIT 10",
+                "activity_types": "MATCH (a:ActivityType) RETURN a.name, a.description, a.category",
+                "roles": "MATCH (r:Role) RETURN r.name, r.description",
+                "processes": "MATCH (p:Process) RETURN p.name, p.description",
+                "features": "MATCH (f:Feature) RETURN f.name, f.description, f.category",
+            },
+        )
     )
-    
+
     # Fallback schema for when schema detection fails
     fallback_schema: str = Field(
-        default=getattr(domain_config, "FALLBACK_SCHEMA", """
+        default=getattr(
+            domain_config,
+            "FALLBACK_SCHEMA",
+            """
             Node properties:
             Feature {name: STRING, description: STRING, category: STRING}
             Process {name: STRING, description: STRING}
             Task {name: STRING, description: STRING}
             Role {name: STRING, description: STRING}
             Chunk {text: STRING, index: INTEGER}
-            
+
             The relationships:
             (:Process)-[:HAS_STEP]->(:Task)
             (:Feature)-[:REQUIRES]->(:Feature)
             (:Task)-[:PERFORMED_BY]->(:Role)
             (:Feature)-[:PART_OF]->(:Feature)
             (:Chunk)-[:NEXT_CHUNK]->(:Chunk)
-        """)
+        """,
+        )
     )
 
     @validator("neo4j")
