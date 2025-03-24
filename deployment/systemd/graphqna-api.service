@@ -5,10 +5,10 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=graphqna
-WorkingDirectory=/opt/graphqna
-EnvironmentFile=/opt/graphqna/.env
-ExecStart=/opt/graphqna/venv/bin/python /opt/graphqna/scripts/run_api.py
+User=ubuntu
+WorkingDirectory=/home/ubuntu/GraphQnA
+EnvironmentFile=/home/ubuntu/GraphQnA/.env
+ExecStart=/home/ubuntu/GraphQnA/venv/bin/python /home/ubuntu/GraphQnA/scripts/run_api.py
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal

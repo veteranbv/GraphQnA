@@ -2,14 +2,13 @@
 Description=GraphQnA Slack Bot
 After=network.target graphqna-api.service
 Wants=network-online.target
-Requires=graphqna-api.service
 
 [Service]
 Type=simple
-User=graphqna
-WorkingDirectory=/opt/graphqna
-EnvironmentFile=/opt/graphqna/.env
-ExecStart=/opt/graphqna/venv/bin/python /opt/graphqna/scripts/run_slack_bot.py
+User=ubuntu
+WorkingDirectory=/home/ubuntu/GraphQnA
+EnvironmentFile=/home/ubuntu/GraphQnA/.env
+ExecStart=/home/ubuntu/GraphQnA/venv/bin/python /home/ubuntu/GraphQnA/scripts/run_slack_bot.py
 Restart=on-failure
 RestartSec=10
 StandardOutput=journal
